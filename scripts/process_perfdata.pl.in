@@ -320,6 +320,17 @@ sub process_perfdata {
         next;
     }
 
+    # remove unprintable and control characters
+    $NAGIOS{PERFDATA} =~ s/[^[:ascii:]]//g;
+    $NAGIOS{PERFDATA} =~ s/[\x00-\x1f]//g;
+    if ($NAGIOS{SERVICEPERFDATA}) {
+      $NAGIOS{SERVICEPERFDATA} =~ s/[^[:ascii:]]//g;
+      $NAGIOS{SERVICEPERFDATA} =~ s/[\x00-\x1f]//g;
+    } elsif ($NAGIOS{HOSTPERFDATA}) {
+      $NAGIOS{HOSTPERFDATA} =~ s/[^[:ascii:]]//g;
+      $NAGIOS{HOSTPERFDATA} =~ s/[\x00-\x1f]//g;
+    }
+
     if ( $NAGIOS{PERFDATA} =~ /^(.*)\s\[(.*)\]$/ ) {
         $NAGIOS{PERFDATA}      = $1;
         $NAGIOS{CHECK_COMMAND} = $2;
