@@ -38,5 +38,5 @@ for L in $LANG; do
     done
     ((lindex++))
 done
-rm de_DE/dwnld.html
-ln -s ../en_US/dwnld.html de_DE/dwnld.html
+rm -f de_DE/dwnld.html
+cp en_US/dwnld.html de_DE/dwnld.html
