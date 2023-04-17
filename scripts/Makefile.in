@@ -19,7 +19,7 @@ all html:
 clean:
 
 distclean: clean
-	-rm -f process_perfdata.pl check_pnp_rrds.pl net2pnp.pl rc.npcd rc.pnp_gearman_worker rrd_convert.pl
+	-rm -f process_perfdata.pl check_pnp_rrds.pl net2pnp.pl rc.npcd rc.pnp_gearman_worker rrd_convert.pl rrd_modify.pl
 	-rm -f Makefile
 
 devclean: distclean
