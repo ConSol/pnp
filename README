@@ -1,7 +1,7 @@
-This project is no longer active.
+This project is a fork of https://github.com/lingej/pnp4nagios
 
-Thank you for the many years we have worked together on this project.
+It contains all patches required to build pnp within OMD-Labs (https://github.com/ConSol/omd)
 
-Feel free to take over the project.
-
-This repository is no longer maintained!
+Changes:
+	- add support for PHP 7 / 8
+	- add support for rrdtool 1.8.0
