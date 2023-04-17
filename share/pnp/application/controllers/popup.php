@@ -3,10 +3,11 @@
  * Popup controller.
  *
  * @package    PNP4Nagios
- * @author     Joerg Linge 
+ * @author     Joerg Linge
  * @license    GPL
  */
 class Popup_Controller extends System_Controller  {
+    public $imgwidth = NULL;
 
 
     public function __construct()

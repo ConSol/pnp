@@ -7,6 +7,8 @@
  * @license    GPL
  */
 class Mobile_Controller extends System_Controller  {
+    public $is_authorized = NULL;
+    public $result = NULL;
 
     public function __construct()
     {
@@ -87,7 +89,7 @@ class Mobile_Controller extends System_Controller  {
     {
         if($goto == 'classic'){
             $this->session->set('classic-ui',1);
-            url::redirect("graph");    
+            url::redirect("graph");
         }
     }
 }

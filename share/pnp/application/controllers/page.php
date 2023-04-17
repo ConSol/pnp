@@ -7,6 +7,8 @@
  * @license    GPL
  */
 class Page_Controller extends System_Controller  {
+    public $is_authorized = NULL;
+    public $page = NULL;
 
     public function __construct(){
         parent::__construct();
@@ -50,7 +52,7 @@ class Page_Controller extends System_Controller  {
         $this->template->page->pages_box->pages   = $this->pages;
         // Basket Box
         $this->template->page->basket_box         = $this->add_view('basket_box');
-        // Icon Box    
+        // Icon Box
         $this->template->page->icon_box           = $this->add_view('icon_box');
         $this->template->page->icon_box->position = "page";
 
@@ -70,7 +72,7 @@ class Page_Controller extends System_Controller  {
             $this->pages = $this->data->getPages();
             $this->template->page->pages_box          = $this->add_view('pages_box');
             $this->template->page->pages_box->pages   = $this->pages;
-            // Icon Box    
+            // Icon Box
             $this->template->page->icon_box           = $this->add_view('icon_box');
             $this->template->page->icon_box->position = "basket";
         }else{
