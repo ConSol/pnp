@@ -46,7 +46,7 @@ class Mobile_Controller extends System_Controller  {
         $this->template->query = $this->add_view('mobile_search');
         $query     = pnp::clean($this->input->post('term'));
         $result    = array();
-        if(strlen($query)>=1) {
+        if($query !== NULL && strlen($query)>=1) {
             $hosts = $this->data->getHosts();
             foreach($hosts as $host){
                 if(preg_match("/$query/i",$host['name'])){

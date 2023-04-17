@@ -857,8 +857,8 @@ final class Kohana {
 	{
 		try
 		{
-			// PHP errors have 5 args, always
-			$PHP_ERROR = (func_num_args() === 5);
+			// PHP errors have 4 or 5 args, always
+			$PHP_ERROR = (func_num_args() === 4 || func_num_args() === 5);
 	
 			// Test to see if errors should be displayed
 			if ($PHP_ERROR AND (error_reporting() & $exception) === 0)

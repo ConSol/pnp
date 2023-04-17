@@ -266,7 +266,7 @@ class Data_Model extends System_Model
         $xml         = array();
         if (file_exists($xmlfile)) {
             libxml_use_internal_errors(TRUE);
-            libxml_clear_errors(TRUE);
+            libxml_clear_errors();
             if(! $xml = simplexml_load_file($xmlfile) ){;
                 if( $throw_exception == TRUE ){
                     $errors = '<br>';
@@ -473,9 +473,9 @@ class Data_Model extends System_Model
             $template_file = $this->findTemplate( $template, $type );
             $TIMERANGE     = $this->TIMERANGE;
         }
-        $def     = FALSE;
-        $opt     = FALSE;
-        $ds_name = FALSE;
+        $def     = [];
+        $opt     = [];
+        $ds_name = [];
         /*
         * 0.4.x Template compatibility 
         */
@@ -513,17 +513,17 @@ class Data_Model extends System_Model
             $ds_name = $tmp;
         }
         //
-        if($def != FALSE){
+        if(count($def) > 0){
             $this->RRD['def'] = $this->array_reindex($def);
         }else{
             throw new Kohana_Exception('error.template-without-def', $template_file);
         }
-        if($opt != FALSE ){
+        if(count($opt) > 0){
             $this->RRD['opt'] = $this->array_reindex($opt);
         }else{
             throw new Kohana_Exception('error.template-without-opt', $template_file);
         }
-        if( $ds_name != FALSE ){
+        if(count($ds_name) > 0){
             $this->RRD['ds_name'] = $this->array_reindex($ds_name);
         }
         return TRUE;        
