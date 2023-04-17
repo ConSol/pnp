@@ -16,6 +16,8 @@ class Auth_Model extends System_Model {
     public $AUTH_ENABLED = FALSE;
     public $REMOTE_USER = NULL;
 
+    public $config       = NULL;
+
     public function __construct() {
         $this->config = new Config_Model;
         $this->config->read_config();

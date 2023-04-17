@@ -7,7 +7,9 @@
  * @license    GPL
  */
 class Zoom_Controller extends System_Controller  {
-
+    public $graph_width = NULL;
+    public $graph_height = NULL;
+    public $url = NULL;
 
     public function __construct()
     {

@@ -7,6 +7,12 @@
  * @license    GPL
  */
 class Docs_Controller extends System_Controller  {
+    public $doc_language = NULL;
+    public $lang = NULL;
+    public $page = NULL;
+    public $content = NULL;
+    public $toc = NULL;
+    public $graph_width = NULL;
 
     public function __construct()
     {

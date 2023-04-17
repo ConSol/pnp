@@ -7,6 +7,21 @@
  * @license GPL
  */
 class System_Controller extends Template_Controller {
+    public $data = NULL;
+    public $config = NULL;
+    public $rrdtool = NULL;
+    public $auth = NULL;
+    public $start = NULL;
+    public $end = NULL;
+    public $theme = NULL;
+    public $view = NULL;
+    public $host = NULL;
+    public $service = NULL;
+    public $source = NULL;
+    public $version = NULL;
+    public $tpl = NULL;
+    public $controller = NULL;
+    public $session = NULL;
 
     public function __construct()
     {

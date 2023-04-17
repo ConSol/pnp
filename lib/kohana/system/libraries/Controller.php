@@ -11,6 +11,8 @@
  * @license    http://kohanaphp.com/license.html
  */
 abstract class Controller_Core {
+    public $uri   = NULL;
+    public $input = NULL;
 
 	// Allow all controllers to run in production by default
 	const ALLOW_PRODUCTION = TRUE;
