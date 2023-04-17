@@ -5,6 +5,9 @@
 ###############################
 
 
+NAME=@PKG_NAME@
+VERSION=@PKG_VERSION@
+
 # Source code directories
 SRC_BASE=@srcdir@/src
 SRC_SHARE=@srcdir@/share
@@ -181,3 +184,5 @@ fullinstall: install install-webconf install-config install-init
 	@echo "Enjoy."
 	@echo ""
 
+dist:
+	git archive --prefix=$(NAME)-$(VERSION)/ HEAD > $(NAME)-$(VERSION).tar.gz
