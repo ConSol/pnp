@@ -185,4 +185,4 @@ fullinstall: install install-webconf install-config install-init
 	@echo ""
 
 dist:
-	git archive --prefix=$(NAME)-$(VERSION)/ HEAD > $(NAME)-$(VERSION).tar.gz
+	git archive --format=tar.gz -9 --prefix=$(NAME)-$(VERSION)/ HEAD > $(NAME)-$(VERSION).tar.gz
