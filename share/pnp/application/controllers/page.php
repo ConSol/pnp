@@ -9,6 +9,8 @@
 class Page_Controller extends System_Controller  {
     public $is_authorized = NULL;
     public $page = NULL;
+    public $pages = NULL;
+    public $url = NULL;
 
     public function __construct(){
         parent::__construct();

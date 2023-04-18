@@ -88,7 +88,7 @@ foreach($this->data->STRUCT as $key=>$value){
 	# treated like a url fragment when zooming
 	$gid = array();
 	parse_str(ltrim($this->url, '?'), $gid);
-	$gid = htmlentities("?host=".urlencode($gid["host"])."&srv=".urlencode(isset($gid["srv"]) ? $gid["srv"] : ''));
+	$gid = htmlentities("?host=".urlencode(isset($gid["host"]) ? $gid["host"] : '')."&srv=".urlencode(isset($gid["srv"]) ? $gid["srv"] : ''));
 
 	echo "<div start=".$value['TIMERANGE']['start']." end=".$value['TIMERANGE']['end']." style=\"width:".$value['GRAPH_WIDTH']."px; height:".$value['GRAPH_HEIGHT']."px; position:absolute; top:33px\" class=\"graph\" id=\"".$gid."\" ></div>";
 

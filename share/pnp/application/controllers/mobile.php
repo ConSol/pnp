@@ -9,6 +9,7 @@
 class Mobile_Controller extends System_Controller  {
     public $is_authorized = NULL;
     public $result = NULL;
+    public $page = NULL;
 
     public function __construct()
     {
