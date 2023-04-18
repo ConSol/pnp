@@ -86,7 +86,7 @@ class Auth_Model extends System_Model {
         }
         
         // Decode the json response
-        $obj = json_decode(utf8_encode($read));
+        $obj = json_decode(mb_convert_encoding($read, 'UTF-8', mb_list_encodings()));
         socket_close($this->SOCKET);
         $this->SOCKET = NULL;
         return $obj;
