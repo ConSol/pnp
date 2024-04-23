@@ -5,6 +5,69 @@
 * @package    pnp4nagios
 * @author     Joerg Linge
 * @license    GPL
+*
+* Examples:
+*
+* VERSION:
+*
+*   get pnp version:
+*
+*       curl -s -u '<user>:<pass>' 'https://host/pnp4nagios/index.php/api'
+*
+*
+* HOSTS:
+*
+*   list all hosts:
+*
+*       curl -s -u '<user>:<pass>' 'https://host/pnp4nagios/index.php/api/hosts'
+*
+*
+* SERVICES:
+*
+*   list all services of a host:
+*
+*       curl -s -u '<user>:<pass>' -H "Content-Type: application/json" \
+*         -X POST -d ' { "host":"host.example.org" }' 'https://host/pnp4nagios/index.php/api/services'
+*    or:
+*       curl -s -u '<user>:<pass>' 'https://host/pnp4nagios/index.php/api/services?host=host.example.org'
+*
+*
+*   list all services of by host regexp:
+*
+*       curl -s -u '<user>:<pass>' -H "Content-Type: application/json" \
+*         -X POST -d ' { "host":"/^local/" }' https://host/pnp4nagios/index.php/api/services
+*    or:
+*       curl -s -u '<user>:<pass>' 'https://host/pnp4nagios/index.php/api/services?host=/^local/'
+*
+* LABEL:
+*
+*   list labels of a service of specific host:
+*
+*       curl -s -u '<user>:<pass>' -H "Content-Type: application/json" \
+*         -X POST -d ' { "host":"host.example.org", "service": "_HOST_" }' 'https://host/pnp4nagios/index.php/api/labels'
+*    or:
+*       curl -s -u '<user>:<pass>' 'https://host/pnp4nagios/index.php/api/labels?host=localhost&service=_HOST_'
+*
+* METRICS:
+*
+*   get all metrics for given targets:
+*       curl -s -u '<user>:<pass>' -H "Content-Type: application/json" -X POST -d '
+*         { "targets":[
+*             {
+*               "host":      "localhost",
+*               "service":   "_HOST_",
+*               "perflabel": "rta",
+*               "type":      "AVERAGE"
+*             },{
+*               "host":      "...",
+*               ...
+*             }
+*           ],
+*           "start": "UNIXEPOCHTIMESTAMP_START",
+*           "end":   "UNIXEPOCHTIMESTAMP_END"
+*         }' 'https://host/pnp4nagios/index.php/api/metrics'
+*    or:
+*       curl -s -u '<user>:<pass>' 'https://host/pnp4nagios/index.php/api/metrics?host=localhost&service=_HOST_&type=AVERAGE&perflabel=rta'
 */
 class Api_Controller extends System_Controller  {
   public $post_data = NULL;
@@ -26,10 +89,7 @@ class Api_Controller extends System_Controller  {
     return_json($data, 200);
   }
 
-  /*
-  *
-  *
-  */
+  /* list all hosts */
   public function hosts($query = false) {
     $data  = array();
     $hosts = getHosts($this->data, $query);
@@ -41,21 +101,18 @@ class Api_Controller extends System_Controller  {
     return_json($data, 200);
   }
 
-  /*
-  *
-  *
-  */
+  /* list all services of a host */
   public function services() {
-    $data  = array();
-    if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-      // Only Post Reuests
-      $data['error'] = "Only POST Requests allowed";
+    $pdata = json_decode(file_get_contents('php://input'), TRUE);
+    if(json_last_error() !== JSON_ERROR_NONE) {
+      $data['error'] = "JSON INPUT ERROR: ".json_last_error_msg();
+      json_encode(0); # reset last error message
       return_json($data, 901);
       return;
     }
-    $pdata = json_decode(file_get_contents('php://input'), TRUE);
 
-    $host = arr_get($pdata, "host");
+    $data  = array();
+    $host  = isset($_REQUEST["host"]) ? $_REQUEST["host"] : arr_get($pdata, "host");
     if ( $host === false ){
       $data['error'] = "No hostname specified";
       return_json($data, 901);
@@ -81,21 +138,19 @@ class Api_Controller extends System_Controller  {
     return_json($data, 200);
   }
 
-  /*
-  *
-  *
-  */
+  /* list all labels of given service of a host */
   public function labels ( $host=false, $service=false ) {
-    $data = array();
-    if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-      // Only Post Reuests
-      $data['error'] = "Only POST Requests allowed";
+    $pdata = json_decode(file_get_contents('php://input'), TRUE);
+    if(json_last_error() !== JSON_ERROR_NONE) {
+      $data['error'] = "JSON INPUT ERROR: ".json_last_error_msg();
+      json_encode(0); # reset last error message
       return_json($data, 901);
       return;
     }
-    $pdata    = json_decode(file_get_contents('php://input'), TRUE);
-    $host     = arr_get($pdata, "host");
-    $service  = arr_get($pdata, "service");
+
+    $data    = array();
+    $host    = isset($_REQUEST["host"]) ? $_REQUEST["host"] : arr_get($pdata, "host");
+    $service = isset($_REQUEST["service"]) ? $_REQUEST["service"] : arr_get($pdata, "service");
 
     if ( $host === false ){
       $data['error'] = "No hostname specified";
@@ -142,17 +197,27 @@ class Api_Controller extends System_Controller  {
 
   public function metrics(){
     // extract metrics for a given datasource
-    // TODO Multiple sources via regex
-    if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-      // Only Post Reuests
-      $data['error'] = "Only POST Requests allowed";
+    $pdata = json_decode(file_get_contents('php://input'), TRUE);
+    if(json_last_error() !== JSON_ERROR_NONE) {
+      $data['error'] = "JSON INPUT ERROR: ".json_last_error_msg();
+      json_encode(0); # reset last error message
       return_json($data, 901);
       return;
     }
+
     $hosts    = array(); // List of all Hosts
     $services = array(); // List of services for a given host
-    $pdata    = json_decode(file_get_contents('php://input'), TRUE);
     $data     = array();
+
+    # allow single target from GET parameters
+    if(isset($_REQUEST["host"]) && isset($_REQUEST["service"]) && isset($_REQUEST["perflabel"]) && isset($_REQUEST["type"])) {
+      $pdata["targets"] = array(array(
+        'host'        => $_REQUEST["host"],
+        'service'     => $_REQUEST["service"],
+        'perflabel'   => $_REQUEST["perflabel"],
+        'type'        => $_REQUEST["type"],
+      ));
+    }
 
     if ( !isset($pdata['targets']) ){
       $data['error'] = "No targets specified";
@@ -160,12 +225,15 @@ class Api_Controller extends System_Controller  {
       return;
     }
 
+    $ts_start = isset($_REQUEST["start"]) ? $_REQUEST["start"] : arr_get($pdata, "start", time() - 86400);
+    $ts_end   = isset($_REQUEST["end"]) ? $_REQUEST["end"] : arr_get($pdata, "end", time());
+
     $data['targets'] = array();
     foreach( $pdata['targets'] as $key => $target){
 
       $data['targets'][$key] = array();
-      $this->data->TIMERANGE['start'] = arr_get($pdata,  'start');
-      $this->data->TIMERANGE['end']   = arr_get($pdata,  'end');
+      $this->data->TIMERANGE['start'] = $ts_start;
+      $this->data->TIMERANGE['end']   = $ts_end;
       $host        = arr_get($target, 'host');
       $service     = arr_get($target, 'service');
       $perflabel   = arr_get($target, 'perflabel');
@@ -232,6 +300,16 @@ class Api_Controller extends System_Controller  {
             $xml = $this->rrdtool->doXport($this->data->XPORT);
           } catch (Kohana_Exception $e) {
             $data['error'] = "$e";
+            return_json($data, 901);
+            return;
+          }
+          if(strpos($xml, "ERROR:") !== false) {
+            $data['error'] = "$xml";
+            return_json($data, 901);
+            return;
+          }
+          if(strpos($xml, "<") !== 0) {
+            $data['error'] = "$xml";
             return_json($data, 901);
             return;
           }
