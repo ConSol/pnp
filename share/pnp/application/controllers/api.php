@@ -277,6 +277,7 @@ class Api_Controller extends System_Controller  {
         }
 
         // create a Perflabel List
+        $exportlabel = array();
         $perflabels = array();
         foreach( $this->data->DS as $value){
           $label = arr_get($value, "LABEL" );
@@ -292,29 +293,33 @@ class Api_Controller extends System_Controller  {
                             "warn"  => arr_get($value, "WARN" ),
                             "crit"  => arr_get($value, "CRIT" )
           );
+          $exportlabel[arr_get($value, "NAME" )] = true;
+        }
+        if(sizeof($exportlabel) == 0){
+          continue;
         }
 
-        foreach ( $perflabels as $tmp_perflabel){
-          try {
-            $this->data->buildXport($host == "pnp-internal" ? ".pnp-internal" : $host, $service);
-            $xml = $this->rrdtool->doXport($this->data->XPORT);
-          } catch (Kohana_Exception $e) {
-            $data['error'] = "$e";
-            return_json($data, 901);
-            return;
-          }
-          if(strpos($xml, "ERROR:") !== false) {
-            $data['error'] = "$xml";
-            return_json($data, 901);
-            return;
-          }
-          if(strpos($xml, "<") !== 0) {
-            $data['error'] = "$xml";
-            return_json($data, 901);
-            return;
-          }
+        try {
+          $this->data->buildXport($host == "pnp-internal" ? ".pnp-internal" : $host, $service, $exportlabel, ($type == "MIN" || $type == "MAX") ? $type : 'AVERAGE');
+          $xml = $this->rrdtool->doXport($this->data->XPORT);
+        } catch (Kohana_Exception $e) {
+          $data['error'] = "$e";
+          return_json($data, 901);
+          return;
+        }
+        if(strpos($xml, "ERROR:") !== false) {
+          $data['error'] = "$xml";
+          return_json($data, 901);
+          return;
+        }
+        if(strpos($xml, "<") !== 0) {
+          $data['error'] = "$xml";
+          return_json($data, 901);
+          return;
+        }
+        $xpd   = simplexml_load_string($xml);
 
-          $xpd   = simplexml_load_string($xml);
+        foreach ( $perflabels as $tmp_perflabel){
           $i = 0;
           $index = -1;
           foreach ( $xpd->meta->legend->entry as $k=>$v){
@@ -349,6 +354,7 @@ class Api_Controller extends System_Controller  {
           $data['targets'][$key][$hk]['type']        = $type;
 
           $i  = 0;
+          // simply print out the warning/critical threshold as flat value
           if($type == "WARNING" || $type == "CRITICAL") {
             foreach ( $xpd->data->row as $row=>$value){
               // timestamp in milliseconds
